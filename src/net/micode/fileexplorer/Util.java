@@ -28,7 +28,9 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore.MediaColumns;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.View;
@@ -421,4 +423,78 @@ public class Util {
 
     public static int CATEGORY_TAB_INDEX = 0;
     public static int SDCARD_TAB_INDEX = 1;
+    
+    public static final String AUTHORITY = "media";
+    private static final String CONTENT_AUTHORITY_SLASH = "content://" + AUTHORITY + "/";
+    public static Uri getContentUri(String volumeName) {
+        return Uri.parse(CONTENT_AUTHORITY_SLASH + volumeName +
+                "/file");
+    }
+    
+    public interface FileColumns extends MediaColumns {
+        /**
+         * The MTP storage ID of the file
+         * <P>Type: INTEGER</P>
+         * @hide
+         */
+        public static final String STORAGE_ID = "storage_id";
+
+        /**
+         * The MTP format code of the file
+         * <P>Type: INTEGER</P>
+         * @hide
+         */
+        public static final String FORMAT = "format";
+
+        /**
+         * The index of the parent directory of the file
+         * <P>Type: INTEGER</P>
+         */
+        public static final String PARENT = "parent";
+
+        /**
+         * The MIME type of the file
+         * <P>Type: TEXT</P>
+         */
+        public static final String MIME_TYPE = "mime_type";
+
+        /**
+         * The title of the content
+         * <P>Type: TEXT</P>
+         */
+        public static final String TITLE = "title";
+
+        /**
+         * The media type (audio, video, image or playlist)
+         * of the file, or 0 for not a media file
+         * <P>Type: TEXT</P>
+         */
+        public static final String MEDIA_TYPE = "media_type";
+
+        /**
+         * Constant for the {@link #MEDIA_TYPE} column indicating that file
+         * is not an audio, image, video or playlist file.
+         */
+        public static final int MEDIA_TYPE_NONE = 0;
+
+        /**
+         * Constant for the {@link #MEDIA_TYPE} column indicating that file is an image file.
+         */
+        public static final int MEDIA_TYPE_IMAGE = 1;
+
+        /**
+         * Constant for the {@link #MEDIA_TYPE} column indicating that file is an audio file.
+         */
+        public static final int MEDIA_TYPE_AUDIO = 2;
+
+        /**
+         * Constant for the {@link #MEDIA_TYPE} column indicating that file is a video file.
+         */
+        public static final int MEDIA_TYPE_VIDEO = 3;
+
+        /**
+         * Constant for the {@link #MEDIA_TYPE} column indicating that file is a playlist file.
+         */
+        public static final int MEDIA_TYPE_PLAYLIST = 4;
+    }
 }

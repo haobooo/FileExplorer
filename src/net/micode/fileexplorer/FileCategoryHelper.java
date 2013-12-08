@@ -23,14 +23,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore.Audio;
-import android.provider.MediaStore.Files;
-import android.provider.MediaStore.Files.FileColumns;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
 import android.util.Log;
 
 import net.micode.fileexplorer.FileSortHelper.SortMethod;
 import net.micode.fileexplorer.MediaFile.MediaFileType;
+import net.micode.fileexplorer.Util.FileColumns;
 
 import java.io.FilenameFilter;
 import java.util.HashMap;
@@ -185,7 +184,7 @@ public class FileCategoryHelper {
             case Doc:
             case Zip:
             case Apk:
-                uri = Files.getContentUri(volumeName);
+                uri = Util.getContentUri(volumeName);
                 break;
             case Music:
                 uri = Audio.Media.getContentUri(volumeName);
@@ -256,11 +255,11 @@ public class FileCategoryHelper {
         uri = Images.Media.getContentUri(volumeName);
         refreshMediaCategory(FileCategory.Picture, uri);
 
-        uri = Files.getContentUri(volumeName);
-        refreshMediaCategory(FileCategory.Theme, uri);
-        refreshMediaCategory(FileCategory.Doc, uri);
-        refreshMediaCategory(FileCategory.Zip, uri);
-        refreshMediaCategory(FileCategory.Apk, uri);
+//        uri = Util.getContentUri(volumeName);
+//        refreshMediaCategory(FileCategory.Theme, uri);
+//        refreshMediaCategory(FileCategory.Doc, uri);
+//        refreshMediaCategory(FileCategory.Zip, uri);
+//        refreshMediaCategory(FileCategory.Apk, uri);
     }
 
     private boolean refreshMediaCategory(FileCategory fc, Uri uri) {

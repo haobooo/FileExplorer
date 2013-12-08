@@ -19,23 +19,25 @@
 
 package net.micode.fileexplorer;
 
-import android.app.ActionBar;
-import android.app.ActionBar.Tab;
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v13.app.FragmentPagerAdapter;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.ActionMode;
 
 import java.util.ArrayList;
 
-public class FileExplorerTabActivity extends Activity {
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+
+public class FileExplorerTabActivity extends SherlockFragmentActivity {
     private static final String INSTANCESTATE_TAB = "tab";
     private static final int DEFAULT_OFFSCREEN_PAGES = 2;
     ViewPager mViewPager;
@@ -50,7 +52,8 @@ public class FileExplorerTabActivity extends Activity {
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setOffscreenPageLimit(DEFAULT_OFFSCREEN_PAGES);
 
-        final ActionBar bar = getActionBar();
+        //final ActionBar bar = getActionBar();
+        final ActionBar bar = getSupportActionBar();
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         bar.setDisplayOptions(0, ActionBar.DISPLAY_SHOW_TITLE | ActionBar.DISPLAY_SHOW_HOME);
 
@@ -69,13 +72,13 @@ public class FileExplorerTabActivity extends Activity {
     protected void onPause() {
         super.onPause();
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-        editor.putInt(INSTANCESTATE_TAB, getActionBar().getSelectedNavigationIndex());
+        editor.putInt(INSTANCESTATE_TAB, getSupportActionBar().getSelectedNavigationIndex());
         editor.commit();
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-        if (getActionBar().getSelectedNavigationIndex() == Util.CATEGORY_TAB_INDEX) {
+        if (getSupportActionBar().getSelectedNavigationIndex() == Util.CATEGORY_TAB_INDEX) {
             FileCategoryActivity categoryFragement =(FileCategoryActivity) mTabsAdapter.getItem(Util.CATEGORY_TAB_INDEX);
             if (categoryFragement.isHomePage()) {
                 reInstantiateCategoryTab();
@@ -150,10 +153,10 @@ public class FileExplorerTabActivity extends Activity {
             }
         }
 
-        public TabsAdapter(Activity activity, ViewPager pager) {
-            super(activity.getFragmentManager());
+        public TabsAdapter(SherlockFragmentActivity activity, ViewPager pager) {
+            super(activity.getSupportFragmentManager());
             mContext = activity;
-            mActionBar = activity.getActionBar();
+            mActionBar = activity.getSupportActionBar();
             mViewPager = pager;
             mViewPager.setAdapter(this);
             mViewPager.setOnPageChangeListener(this);
@@ -195,9 +198,10 @@ public class FileExplorerTabActivity extends Activity {
         public void onPageScrollStateChanged(int state) {
         }
 
-        @Override
-        public void onTabSelected(Tab tab, FragmentTransaction ft) {
-            Object tag = tab.getTag();
+		@Override
+		public void onTabSelected(Tab tab,
+				android.support.v4.app.FragmentTransaction ft) {
+			Object tag = tab.getTag();
             for (int i=0; i<mTabs.size(); i++) {
                 if (mTabs.get(i) == tag) {
                     mViewPager.setCurrentItem(i);
@@ -209,14 +213,21 @@ public class FileExplorerTabActivity extends Activity {
                     actionMode.finish();
                 }
             }
-        }
+			
+		}
 
-        @Override
-        public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-        }
+		@Override
+		public void onTabUnselected(Tab tab,
+				android.support.v4.app.FragmentTransaction ft) {
+			// TODO Auto-generated method stub
+			
+		}
 
-        @Override
-        public void onTabReselected(Tab tab, FragmentTransaction ft) {
-        }
+		@Override
+		public void onTabReselected(Tab tab,
+				android.support.v4.app.FragmentTransaction ft) {
+			// TODO Auto-generated method stub
+			
+		}
     }
 }

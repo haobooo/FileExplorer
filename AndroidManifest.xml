@@ -23,7 +23,7 @@
     android:versionCode="1"
     android:versionName="0.1" >
 
-    <uses-sdk android:minSdkVersion="14" />
+    <uses-sdk android:minSdkVersion="9" />
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -37,7 +37,7 @@
     <application
         android:icon="@drawable/icon"
         android:label="@string/app_name"
-        android:theme="@android:style/Theme.Holo.Light"
+        android:theme="@style/Theme.Sherlock.Light"
         android:uiOptions="splitActionBarWhenNarrow">
         <activity
             android:name=".FileExplorerTabActivity"
@@ -85,7 +85,7 @@
             android:label="@string/menu_setting"
             android:launchMode="singleTop"
             android:name="FileExplorerPreferenceActivity"
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
+            android:theme="@style/Theme.Sherlock.Light.NoActionBar" >
         </activity>
 
         <meta-data

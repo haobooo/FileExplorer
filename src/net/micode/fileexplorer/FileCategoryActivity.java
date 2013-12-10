@@ -14,8 +14,6 @@ import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -35,7 +33,11 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class FileCategoryActivity extends Fragment implements IFileInteractionListener,
+import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+
+public class FileCategoryActivity extends SherlockFragment implements IFileInteractionListener,
         FavoriteDatabaseListener, IBackPressedListener {
 
     public static final String EXT_FILETER_KEY = "ext_filter";

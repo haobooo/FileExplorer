@@ -24,6 +24,10 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -35,8 +39,6 @@ import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -46,7 +48,7 @@ import android.widget.ListView;
 import net.micode.fileexplorer.FileExplorerTabActivity.IBackPressedListener;
 import net.micode.fileexplorer.FileViewInteractionHub.Mode;
 
-public class FileViewActivity extends Fragment implements
+public class FileViewActivity extends SherlockFragment implements
         IFileInteractionListener, IBackPressedListener {
 
     public static final String EXT_FILTER_KEY = "ext_filter";
@@ -100,6 +102,12 @@ public class FileViewActivity extends Fragment implements
 
     private boolean mBackspaceExit;
 
+    @Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
+	}
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mActivity = getActivity();

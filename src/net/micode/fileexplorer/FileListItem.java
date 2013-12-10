@@ -19,13 +19,15 @@
 
 package net.micode.fileexplorer;
 
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.ActionMode;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
-import android.view.ActionMode;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -131,73 +133,76 @@ public class FileListItem {
         }
 
         @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            MenuInflater inflater = ((Activity) mContext).getMenuInflater();
+        public void onDestroyActionMode(ActionMode mode) {
+            mFileViewInteractionHub.clearSelection();
+            ((FileExplorerTabActivity) mContext).setActionMode(null);
+        }
+
+		@Override
+		public boolean onCreateActionMode(ActionMode mode,
+				com.actionbarsherlock.view.Menu menu) {
+			MenuInflater inflater = ((SherlockFragmentActivity) mContext).getSupportMenuInflater();
             mMenu = menu;
             inflater.inflate(R.menu.operation_menu, mMenu);
             initMenuItemSelectAllOrCancel();
             return true;
-        }
+		}
 
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            mMenu.findItem(R.id.action_copy_path).setVisible(
+		@Override
+		public boolean onPrepareActionMode(ActionMode mode,
+				com.actionbarsherlock.view.Menu menu) {
+			mMenu.findItem(R.id.action_copy_path).setVisible(
                     mFileViewInteractionHub.getSelectedFileList().size() == 1);
             mMenu.findItem(R.id.action_cancel).setVisible(
             		mFileViewInteractionHub.isSelected());
             mMenu.findItem(R.id.action_select_all).setVisible(
             		!mFileViewInteractionHub.isSelectedAll());
             return true;
-        }
+		}
 
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.action_delete:
-                    mFileViewInteractionHub.onOperationDelete();
-                    mode.finish();
-                    break;
-                case R.id.action_copy:
-                    ((FileViewActivity) ((FileExplorerTabActivity) mContext)
-                            .getFragment(Util.SDCARD_TAB_INDEX))
-                            .copyFile(mFileViewInteractionHub.getSelectedFileList());
-                    mode.finish();
-                    scrollToSDcardTab();
-                    break;
-                case R.id.action_move:
-                    ((FileViewActivity) ((FileExplorerTabActivity) mContext)
-                            .getFragment(Util.SDCARD_TAB_INDEX))
-                            .moveToFile(mFileViewInteractionHub.getSelectedFileList());
-                    mode.finish();
-                    scrollToSDcardTab();
-                    break;
-                case R.id.action_send:
-                    mFileViewInteractionHub.onOperationSend();
-                    mode.finish();
-                    break;
-                case R.id.action_copy_path:
-                    mFileViewInteractionHub.onOperationCopyPath();
-                    mode.finish();
-                    break;
-                case R.id.action_cancel:
-                    mFileViewInteractionHub.clearSelection();
-                    initMenuItemSelectAllOrCancel();
-                    mode.finish();
-                    break;
-                case R.id.action_select_all:
-                    mFileViewInteractionHub.onOperationSelectAll();
-                    initMenuItemSelectAllOrCancel();
-                    break;
-            }
-            Util.updateActionModeTitle(mode, mContext, mFileViewInteractionHub
-                    .getSelectedFileList().size());
-            return false;
+		@Override
+		public boolean onActionItemClicked(ActionMode mode,
+				com.actionbarsherlock.view.MenuItem item) {
+			switch (item.getItemId()) {
+            case R.id.action_delete:
+                mFileViewInteractionHub.onOperationDelete();
+                mode.finish();
+                break;
+            case R.id.action_copy:
+                ((FileViewActivity) ((FileExplorerTabActivity) mContext)
+                        .getFragment(Util.SDCARD_TAB_INDEX))
+                        .copyFile(mFileViewInteractionHub.getSelectedFileList());
+                mode.finish();
+                scrollToSDcardTab();
+                break;
+            case R.id.action_move:
+                ((FileViewActivity) ((FileExplorerTabActivity) mContext)
+                        .getFragment(Util.SDCARD_TAB_INDEX))
+                        .moveToFile(mFileViewInteractionHub.getSelectedFileList());
+                mode.finish();
+                scrollToSDcardTab();
+                break;
+            case R.id.action_send:
+                mFileViewInteractionHub.onOperationSend();
+                mode.finish();
+                break;
+            case R.id.action_copy_path:
+                mFileViewInteractionHub.onOperationCopyPath();
+                mode.finish();
+                break;
+            case R.id.action_cancel:
+                mFileViewInteractionHub.clearSelection();
+                initMenuItemSelectAllOrCancel();
+                mode.finish();
+                break;
+            case R.id.action_select_all:
+                mFileViewInteractionHub.onOperationSelectAll();
+                initMenuItemSelectAllOrCancel();
+                break;
         }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            mFileViewInteractionHub.clearSelection();
-            ((FileExplorerTabActivity) mContext).setActionMode(null);
-        }
+        Util.updateActionModeTitle(mode, mContext, mFileViewInteractionHub
+                .getSelectedFileList().size());
+        return false;
+		}
     }
 }

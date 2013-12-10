@@ -32,7 +32,6 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore.MediaColumns;
 import android.util.Log;
-import android.view.ActionMode;
 import android.view.View;
 import android.widget.TextView;
 
@@ -46,6 +45,8 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+
+import com.actionbarsherlock.view.ActionMode;
 
 public class Util {
     private static String ANDROID_SECURE = "/mnt/sdcard/.android_secure";

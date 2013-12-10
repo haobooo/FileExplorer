@@ -28,14 +28,13 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.view.ActionMode;
 
 import java.util.ArrayList;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.ActionMode;
 
 public class FileExplorerTabActivity extends SherlockFragmentActivity {
     private static final String INSTANCESTATE_TAB = "tab";
@@ -66,6 +65,7 @@ public class FileExplorerTabActivity extends SherlockFragmentActivity {
                 ServerControlActivity.class, null);
         bar.setSelectedNavigationItem(PreferenceManager.getDefaultSharedPreferences(this)
                 .getInt(INSTANCESTATE_TAB, Util.CATEGORY_TAB_INDEX));
+        
     }
 
     @Override

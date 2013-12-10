@@ -22,6 +22,8 @@ package net.micode.fileexplorer;
 import java.io.File;
 import java.util.ArrayList;
 
+import com.actionbarsherlock.view.ActionMode;
+
 import android.R.drawable;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -35,7 +37,6 @@ import android.net.Uri;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -670,41 +671,41 @@ public class FileViewInteractionHub implements IOperationProgressListener {
     }
 
     // context menu
-    private OnCreateContextMenuListener mListViewContextMenuListener = new OnCreateContextMenuListener() {
-        @Override
-        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-            if (isInSelection() || isMoveState())
-                return;
-
-            showDropdownNavigation(false);
-
-            AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
-
-            FavoriteDatabaseHelper databaseHelper = FavoriteDatabaseHelper.getInstance();
-            FileInfo file = mFileViewListener.getItem(info.position);
-            if (databaseHelper != null && file != null) {
-                int stringId = databaseHelper.isFavorite(file.filePath) ? R.string.operation_unfavorite
-                        : R.string.operation_favorite;
-                addMenuItem(menu, GlobalConsts.MENU_FAVORITE, 0, stringId);
-            }
-
-            addMenuItem(menu, GlobalConsts.MENU_COPY, 0, R.string.operation_copy);
-            addMenuItem(menu, GlobalConsts.MENU_COPY_PATH, 0, R.string.operation_copy_path);
-            // addMenuItem(menu, GlobalConsts.MENU_PASTE, 0,
-            // R.string.operation_paste);
-            addMenuItem(menu, GlobalConsts.MENU_MOVE, 0, R.string.operation_move);
-            addMenuItem(menu, MENU_SEND, 0, R.string.operation_send);
-            addMenuItem(menu, MENU_RENAME, 0, R.string.operation_rename);
-            addMenuItem(menu, MENU_DELETE, 0, R.string.operation_delete);
-            addMenuItem(menu, MENU_INFO, 0, R.string.operation_info);
-
-            if (!canPaste()) {
-                MenuItem menuItem = menu.findItem(GlobalConsts.MENU_PASTE);
-                if (menuItem != null)
-                    menuItem.setEnabled(false);
-            }
-        }
-    };
+//    private OnCreateContextMenuListener mListViewContextMenuListener = new OnCreateContextMenuListener() {
+//        @Override
+//        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+//            if (isInSelection() || isMoveState())
+//                return;
+//
+//            showDropdownNavigation(false);
+//
+//            AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
+//
+//            FavoriteDatabaseHelper databaseHelper = FavoriteDatabaseHelper.getInstance();
+//            FileInfo file = mFileViewListener.getItem(info.position);
+//            if (databaseHelper != null && file != null) {
+//                int stringId = databaseHelper.isFavorite(file.filePath) ? R.string.operation_unfavorite
+//                        : R.string.operation_favorite;
+//                addMenuItem(menu, GlobalConsts.MENU_FAVORITE, 0, stringId);
+//            }
+//
+//            addMenuItem(menu, GlobalConsts.MENU_COPY, 0, R.string.operation_copy);
+//            addMenuItem(menu, GlobalConsts.MENU_COPY_PATH, 0, R.string.operation_copy_path);
+//            // addMenuItem(menu, GlobalConsts.MENU_PASTE, 0,
+//            // R.string.operation_paste);
+//            addMenuItem(menu, GlobalConsts.MENU_MOVE, 0, R.string.operation_move);
+//            addMenuItem(menu, MENU_SEND, 0, R.string.operation_send);
+//            addMenuItem(menu, MENU_RENAME, 0, R.string.operation_rename);
+//            addMenuItem(menu, MENU_DELETE, 0, R.string.operation_delete);
+//            addMenuItem(menu, MENU_INFO, 0, R.string.operation_info);
+//
+//            if (!canPaste()) {
+//                MenuItem menuItem = menu.findItem(GlobalConsts.MENU_PASTE);
+//                if (menuItem != null)
+//                    menuItem.setEnabled(false);
+//            }
+//        }
+//    };
 
     // File List view setup
     private ListView mFileListView;
@@ -714,7 +715,7 @@ public class FileViewInteractionHub implements IOperationProgressListener {
     private void setupFileListView() {
         mFileListView = (ListView) mFileViewListener.getViewById(R.id.file_path_list);
         mFileListView.setLongClickable(true);
-        mFileListView.setOnCreateContextMenuListener(mListViewContextMenuListener);
+        //mFileListView.setOnCreateContextMenuListener(mListViewContextMenuListener);
         mFileListView.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -753,10 +754,10 @@ public class FileViewInteractionHub implements IOperationProgressListener {
 
     private static final int MENU_EXIT = 18;
 
-    private OnMenuItemClickListener menuItemClick = new OnMenuItemClickListener() {
+    private com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener menuItemClick = new com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener() {
 
         @Override
-        public boolean onMenuItemClick(MenuItem item) {
+        public boolean onMenuItemClick(com.actionbarsherlock.view.MenuItem item) {
             AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
             mListViewContextMenuSelectedItem = info != null ? info.position : -1;
 
@@ -852,7 +853,7 @@ public class FileViewInteractionHub implements IOperationProgressListener {
 
     private SelectFilesCallback mSelectFilesCallback;
 
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
         clearSelection();
         showDropdownNavigation(false);
 
@@ -862,7 +863,7 @@ public class FileViewInteractionHub implements IOperationProgressListener {
         addMenuItem(menu, MENU_SELECTALL, 0, R.string.operation_selectall,
                 R.drawable.ic_menu_select_all);
 
-        SubMenu sortMenu = menu.addSubMenu(0, MENU_SORT, 1, R.string.menu_item_sort).setIcon(
+        com.actionbarsherlock.view.SubMenu sortMenu = menu.addSubMenu(0, MENU_SORT, 1, R.string.menu_item_sort).setIcon(
                 R.drawable.ic_menu_sort);
         addMenuItem(sortMenu, MENU_SORT_NAME, 0, R.string.menu_item_sort_name);
         addMenuItem(sortMenu, MENU_SORT_SIZE, 1, R.string.menu_item_sort_size);
@@ -886,30 +887,30 @@ public class FileViewInteractionHub implements IOperationProgressListener {
         return true;
     }
 
-    private void addMenuItem(Menu menu, int itemId, int order, int string) {
+    private void addMenuItem(com.actionbarsherlock.view.Menu menu, int itemId, int order, int string) {
         addMenuItem(menu, itemId, order, string, -1);
     }
 
-    private void addMenuItem(Menu menu, int itemId, int order, int string, int iconRes) {
+    private void addMenuItem(com.actionbarsherlock.view.Menu menu, int itemId, int order, int string, int iconRes) {
         if (!mFileViewListener.shouldHideMenu(itemId)) {
-            MenuItem item = menu.add(0, itemId, order, string).setOnMenuItemClickListener(menuItemClick);
+        	com.actionbarsherlock.view.MenuItem item = menu.add(0, itemId, order, string).setOnMenuItemClickListener(menuItemClick);
             if (iconRes > 0) {
                 item.setIcon(iconRes);
             }
         }
     }
 
-    public boolean onPrepareOptionsMenu(Menu menu) {
+    public boolean onPrepareOptionsMenu(com.actionbarsherlock.view.Menu menu) {
         updateMenuItems(menu);
         return true;
     }
 
-    private void updateMenuItems(Menu menu) {
+    private void updateMenuItems(com.actionbarsherlock.view.Menu menu) {
         menu.findItem(MENU_SELECTALL).setTitle(
                 isSelectedAll() ? R.string.operation_cancel_selectall : R.string.operation_selectall);
         menu.findItem(MENU_SELECTALL).setEnabled(mCurrentMode != Mode.Pick);
 
-        MenuItem menuItem = menu.findItem(GlobalConsts.MENU_SHOWHIDE);
+        com.actionbarsherlock.view.MenuItem menuItem = menu.findItem(GlobalConsts.MENU_SHOWHIDE);
         if (menuItem != null) {
             menuItem.setTitle(Settings.instance().getShowDotAndHiddenFiles() ? R.string.operation_hide_sys
                     : R.string.operation_show_sys);
@@ -917,7 +918,7 @@ public class FileViewInteractionHub implements IOperationProgressListener {
 
         FavoriteDatabaseHelper databaseHelper = FavoriteDatabaseHelper.getInstance();
         if (databaseHelper != null) {
-            MenuItem item = menu.findItem(GlobalConsts.MENU_FAVORITE);
+        	com.actionbarsherlock.view.MenuItem item = menu.findItem(GlobalConsts.MENU_FAVORITE);
             if (item != null) {
                 item.setTitle(databaseHelper.isFavorite(mCurrentPath) ? R.string.operation_unfavorite
                         : R.string.operation_favorite);

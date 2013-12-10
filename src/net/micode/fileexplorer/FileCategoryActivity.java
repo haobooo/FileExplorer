@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -27,6 +28,7 @@ import net.micode.fileexplorer.FileExplorerTabActivity.IBackPressedListener;
 import net.micode.fileexplorer.FileViewInteractionHub.Mode;
 import net.micode.fileexplorer.Util.SDCardInfo;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,6 +47,8 @@ public class FileCategoryActivity extends Fragment implements IFileInteractionLi
     private HashMap<FileCategory, Integer> categoryIndex = new HashMap<FileCategory, Integer>();
 
     private FileListCursorAdapter mAdapter;
+    
+    private FileListNoCursorAdapter mNoAdapter;
 
     private FileViewInteractionHub mFileViewInteractionHub;
 
@@ -70,6 +74,8 @@ public class FileCategoryActivity extends Fragment implements IFileInteractionLi
 
     private boolean mConfigurationChanged = false;
 
+    private ListView mListView;
+    
     public void setConfigurationChanged(boolean changed) {
         mConfigurationChanged = changed;
     }
@@ -99,9 +105,10 @@ public class FileCategoryActivity extends Fragment implements IFileInteractionLi
         mFavoriteList = new FavoriteList(mActivity, (ListView) mRootView.findViewById(R.id.favorite_list), this, mFileIconHelper);
         mFavoriteList.initList();
         mAdapter = new FileListCursorAdapter(mActivity, null, mFileViewInteractionHub, mFileIconHelper);
+        mNoAdapter = new FileListNoCursorAdapter(mActivity, mFileViewInteractionHub, mFileIconHelper);
 
-        ListView fileListView = (ListView) mRootView.findViewById(R.id.file_path_list);
-        fileListView.setAdapter(mAdapter);
+        mListView = (ListView) mRootView.findViewById(R.id.file_path_list);
+        mListView.setAdapter(mAdapter);
 
         setupClick();
         setupCategoryInfo();
@@ -324,9 +331,32 @@ public class FileCategoryActivity extends Fragment implements IFileInteractionLi
         if (curCategory == FileCategory.Favorite || curCategory == FileCategory.All)
             return false;
 
-        Cursor c = mFileCagetoryHelper.query(curCategory, sort.getSortMethod());
-        showEmptyView(c == null || c.getCount() == 0);
-        mAdapter.changeCursor(c);
+        int version = Build.VERSION.SDK_INT;
+        
+        if (version >= 11) {
+	        Cursor c = mFileCagetoryHelper.query(curCategory, sort.getSortMethod());
+	        showEmptyView(c == null || c.getCount() == 0);
+	        mAdapter.changeCursor(c);
+        } else {
+        	if (curCategory == FileCategory.Music ||
+        			curCategory == FileCategory.Video ||
+        			curCategory == FileCategory.Picture) {
+        		Cursor c = mFileCagetoryHelper.query(curCategory, sort.getSortMethod());
+    	        showEmptyView(c == null || c.getCount() == 0);
+    	        mListView.setAdapter(mAdapter);
+    	        mAdapter.changeCursor(c);
+    	        
+        	} else if (curCategory == FileCategory.Theme ||
+	        			curCategory == FileCategory.Doc ||
+	        			curCategory == FileCategory.Zip ||
+	        			curCategory == FileCategory.Apk) {
+        		ArrayList<File> list = FileCategoryHelper.getList(curCategory);
+        		if (list != null) {
+        			mListView.setAdapter(mNoAdapter);
+        			mNoAdapter.setList(list);
+        		}
+        	}
+        }
 
         return true;
     }

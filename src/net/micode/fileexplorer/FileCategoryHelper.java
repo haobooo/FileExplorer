@@ -22,6 +22,8 @@ package net.micode.fileexplorer;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
 import android.provider.MediaStore.Audio;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
@@ -31,7 +33,9 @@ import net.micode.fileexplorer.FileSortHelper.SortMethod;
 import net.micode.fileexplorer.MediaFile.MediaFileType;
 import net.micode.fileexplorer.Util.FileColumns;
 
+import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -56,6 +60,12 @@ public class FileCategoryHelper {
             "zip", "rar"
     };
 
+    public static ArrayList<File> mThemeList = new ArrayList<File>();
+    public static ArrayList<File> mDocList = new ArrayList<File>();
+    public static ArrayList<File> mZipList = new ArrayList<File>();
+    public static ArrayList<File> mApkList = new ArrayList<File>();
+    
+    
     public static HashMap<FileCategory, FilenameExtFilter> filters = new HashMap<FileCategory, FilenameExtFilter>();
 
     public static HashMap<FileCategory, Integer> categoryNames = new HashMap<FileCategory, Integer>();
@@ -73,6 +83,20 @@ public class FileCategoryHelper {
         categoryNames.put(FileCategory.Favorite, R.string.category_favorite);
     }
 
+    public static ArrayList<File> getList(FileCategory fc) {
+    	if (fc == FileCategory.Theme) {
+    		return mThemeList;
+    	} else if (fc == FileCategory.Doc) {
+    		return mDocList;
+    	} else if (fc == FileCategory.Zip) {
+    		return mZipList;
+    	} else if (fc == FileCategory.Apk) {
+    		return mApkList;
+    	}
+    	
+    	return null;
+    }
+    
     public static FileCategory[] sCategories = new FileCategory[] {
             FileCategory.Music, FileCategory.Video, FileCategory.Picture, FileCategory.Theme,
             FileCategory.Doc, FileCategory.Zip, FileCategory.Apk, FileCategory.Other
@@ -254,14 +278,37 @@ public class FileCategoryHelper {
 
         uri = Images.Media.getContentUri(volumeName);
         refreshMediaCategory(FileCategory.Picture, uri);
-
-//        uri = Util.getContentUri(volumeName);
-//        refreshMediaCategory(FileCategory.Theme, uri);
-//        refreshMediaCategory(FileCategory.Doc, uri);
-//        refreshMediaCategory(FileCategory.Zip, uri);
-//        refreshMediaCategory(FileCategory.Apk, uri);
+        
+        int version = Build.VERSION.SDK_INT;
+        
+        if (version >= 11) {
+	        uri = Util.getContentUri(volumeName);
+	        refreshMediaCategory(FileCategory.Theme, uri);
+	        refreshMediaCategory(FileCategory.Doc, uri);
+	        refreshMediaCategory(FileCategory.Zip, uri);
+	        refreshMediaCategory(FileCategory.Apk, uri);
+        } else {
+        	refreshMediaCategoryBelow11(FileCategory.Theme);
+        	refreshMediaCategoryBelow11(FileCategory.Doc);
+        	refreshMediaCategoryBelow11(FileCategory.Zip);
+        	refreshMediaCategoryBelow11(FileCategory.Apk);
+        }
     }
 
+    private boolean refreshMediaCategoryBelow11(FileCategory fc) {
+    	String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+        	File sdcard = Environment.getExternalStorageDirectory();
+        	
+        	CategoryInfo cateInfo = new CategoryInfo();
+        	getMediaCategoryInfo(sdcard, cateInfo, fc);
+        	
+        	setCategoryInfo(fc, cateInfo.count, cateInfo.size);
+        	return true;
+        }
+    	return false;
+    }
+    
     private boolean refreshMediaCategory(FileCategory fc, Uri uri) {
         String[] columns = new String[] {
                 "COUNT(*)", "SUM(_size)"
@@ -282,6 +329,50 @@ public class FileCategoryHelper {
         return false;
     }
 
+    private String buildExtExpression(FileCategory fc) {
+    	String extExpression = "";
+    	
+    	switch(fc) {
+    	case Theme:
+    		extExpression = ".*[.]mtz";
+    		break;
+    	case Doc:
+    		extExpression = ".*[.](txt|doc|docx|pdf|xls|xlsx)";
+    		break;
+    	case Zip:
+    		extExpression = ".*[.](zip|tar|rar)";
+            break;
+        case Apk:
+        	extExpression = ".*[.]apk";
+            break;
+    	}
+    	
+    	return extExpression;
+    }
+    private void getMediaCategoryInfo(File dir, CategoryInfo info, FileCategory fc) {
+    	if (dir == null) return;
+    	
+    	ArrayList<File> destList = getList(fc);
+    	String extExpression = buildExtExpression(fc);
+    	if (destList == null) return;
+    	
+    	File[] files = dir.listFiles();
+    	if (files == null) return;
+    	
+    	for (File file : files) {
+    		if (file.isDirectory()) {
+    			getMediaCategoryInfo(file, info, fc);
+    		} else {
+    			if (file.getName().matches(extExpression)) {
+    				info.count++;
+    				info.size += file.length();
+    				
+    				destList.add(file);
+    			}
+    		}
+    	}
+    }
+    
     public static FileCategory getCategoryFromPath(String path) {
         MediaFileType type = MediaFile.getFileType(path);
         if (type != null) {

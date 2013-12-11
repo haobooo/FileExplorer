@@ -54,6 +54,10 @@ public class FileCategoryHelper {
         All, Music, Video, Picture, Theme, Doc, Zip, Apk, Custom, Other, Favorite
     }
 
+    public static boolean[] isScanned = new boolean[] {
+    	false, false, false, false, false, false, false, false, false, false, false
+    };
+    
     private static String APK_EXT = "apk";
     private static String THEME_EXT = "mtz";
     private static String[] ZIP_EXTS  = new String[] {
@@ -64,7 +68,6 @@ public class FileCategoryHelper {
     public static ArrayList<File> mDocList = new ArrayList<File>();
     public static ArrayList<File> mZipList = new ArrayList<File>();
     public static ArrayList<File> mApkList = new ArrayList<File>();
-    
     
     public static HashMap<FileCategory, FilenameExtFilter> filters = new HashMap<FileCategory, FilenameExtFilter>();
 
@@ -288,10 +291,15 @@ public class FileCategoryHelper {
 	        refreshMediaCategory(FileCategory.Zip, uri);
 	        refreshMediaCategory(FileCategory.Apk, uri);
         } else {
-        	refreshMediaCategoryBelow11(FileCategory.Theme);
-        	refreshMediaCategoryBelow11(FileCategory.Doc);
-        	refreshMediaCategoryBelow11(FileCategory.Zip);
-        	refreshMediaCategoryBelow11(FileCategory.Apk);
+        	
+    		refreshMediaCategoryBelow11(FileCategory.Theme);
+        	
+    		refreshMediaCategoryBelow11(FileCategory.Doc);
+        	
+    		refreshMediaCategoryBelow11(FileCategory.Zip);
+        	
+    		refreshMediaCategoryBelow11(FileCategory.Apk);
+        	
         }
     }
 
@@ -301,7 +309,25 @@ public class FileCategoryHelper {
         	File sdcard = Environment.getExternalStorageDirectory();
         	
         	CategoryInfo cateInfo = new CategoryInfo();
-        	getMediaCategoryInfo(sdcard, cateInfo, fc);
+        	
+        	boolean scanned = isScanned[fc.ordinal()];
+        	
+        	if (!scanned) {
+        		getMediaCategoryInfo(sdcard, cateInfo, fc);
+        		
+        		isScanned[fc.ordinal()] = true;
+        	} else {
+        		ArrayList<File> destList = getList(fc);
+        		if (destList != null) {
+        			cateInfo.count = destList.size();
+        			
+        			for (int i = 0; i < cateInfo.count; i++) {
+        				File file = destList.get(i);
+        				
+        				cateInfo.size += file.length();
+        			}
+        		}
+        	}
         	
         	setCategoryInfo(fc, cateInfo.count, cateInfo.size);
         	return true;
@@ -371,6 +397,7 @@ public class FileCategoryHelper {
     			}
     		}
     	}
+    	
     }
     
     public static FileCategory getCategoryFromPath(String path) {
